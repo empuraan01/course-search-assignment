@@ -9,12 +9,15 @@ import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.query.Criteria;
 import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
 import org.springframework.data.elasticsearch.core.query.Query;
+
+
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,9 +46,25 @@ public class SearchService {
         Criteria criteria = new Criteria();
 
         if (keyword != null && !keyword.isBlank()) {
+            String trimmedKeyword = keyword.trim();
+            
             Criteria textCriteria = new Criteria()
-                    .or(new Criteria("title").contains(keyword))
-                    .or(new Criteria("description").contains(keyword));
+                    .or(new Criteria("title").contains(trimmedKeyword))
+                    .or(new Criteria("description").contains(trimmedKeyword));
+            
+            textCriteria = textCriteria
+                    .or(new Criteria("title").contains(trimmedKeyword.toLowerCase()))
+                    .or(new Criteria("title").contains(trimmedKeyword.toUpperCase()));
+            
+            if (trimmedKeyword.length() > 3) {
+                String[] words = trimmedKeyword.split("\\s+");
+                for (String word : words) {
+                    if (word.length() > 2) {
+                        textCriteria = textCriteria.or(new Criteria("title").contains(word));
+                    }
+                }
+            }
+            
             criteria = criteria.and(textCriteria);
         }
 
@@ -93,6 +112,28 @@ public class SearchService {
                 .toList();
 
         return new SearchResult(hits.getTotalHits(), courses);
+    }
+
+    public SuggestResult suggest(String partialTitle) {
+        logger.info("Suggest called with partial title: {}", partialTitle);
+
+        if (partialTitle == null || partialTitle.trim().isEmpty()) {
+            return new SuggestResult(List.of(), 0);
+        }
+
+
+        Criteria criteria = new Criteria("title").startsWith(partialTitle.trim());
+        Pageable pageable = PageRequest.of(0, 10);
+        Query query = new CriteriaQuery(criteria, pageable);
+
+        SearchHits<CourseDocument> hits = elasticsearchOperations.search(query, CourseDocument.class);
+
+        List<String> suggestions = hits.stream()
+                .map(hit -> hit.getContent().getTitle())
+                .distinct()
+                .collect(Collectors.toList());
+
+        return new SuggestResult(suggestions, suggestions.size());
     }
 
     private void validateSearchParameters(Integer minAge, Integer maxAge, Double minPrice, Double maxPrice, String sort) {

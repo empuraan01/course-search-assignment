@@ -6,6 +6,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
+import org.springframework.data.elasticsearch.annotations.CompletionField;
 
 import java.time.ZonedDateTime;
 
@@ -42,4 +43,7 @@ public class CourseDocument {
 
     @Field(type = FieldType.Date, format = DateFormat.basic_date_time)
     private ZonedDateTime nextSessionDate;
+
+    @CompletionField
+    private String titleSuggest;
 }

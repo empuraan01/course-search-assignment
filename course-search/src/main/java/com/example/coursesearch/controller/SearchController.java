@@ -1,6 +1,7 @@
 package com.example.coursesearch.controller;
 
 import com.example.coursesearch.service.SearchService;
+import com.example.coursesearch.service.SuggestResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +19,11 @@ import com.example.coursesearch.service.SearchResult;
 public class SearchController {
 
     private final SearchService searchService;
+
+    @GetMapping("/suggest")
+    public SuggestResult suggestCourses(@RequestParam String q) {
+        return searchService.suggest(q);
+    }
 
     @GetMapping
     public SearchResult searchCourses(

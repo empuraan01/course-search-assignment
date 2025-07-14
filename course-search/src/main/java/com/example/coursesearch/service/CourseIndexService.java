@@ -31,6 +31,10 @@ public class CourseIndexService {
 
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream("sample-courses.json");
             List<CourseDocument> courses = objectMapper.readValue(inputStream, new TypeReference<List<CourseDocument>>() {});
+            
+
+            courses.forEach(course -> course.setTitleSuggest(course.getTitle()));
+            
             courseRepository.saveAll(courses);
             logger.info("Indexed " + courses.size() + " courses into es.");
             logger.info(courses.get(0).getId() + " → " + courses.get(0).getNextSessionDate());
