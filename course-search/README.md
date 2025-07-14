@@ -17,6 +17,13 @@ A Spring Boot application that provides course search functionality using Elasti
 - ✅ **Autocomplete (Completion Suggester)**: `/api/search/suggest?q={partialTitle}`
 - ✅ **Fuzzy Search Enhancement**: Enhanced `/api/search` with fuzzy matching on titles
 
+### Testing & Quality Assurance
+- ✅ **Comprehensive Unit Tests**: Full test coverage for both controller and service layers
+- ✅ **Mockito Integration**: Proper mocking and stubbing for isolated testing
+- ✅ **Edge Case Testing**: Tests for null values, empty results, and error scenarios
+- ✅ **Parameter Validation Testing**: Tests for all search parameters and edge cases
+- ✅ **Autocomplete Testing**: Tests for various query scenarios including empty and special characters
+
 ## API Endpoints
 
 ### 1. Search Courses
@@ -137,6 +144,59 @@ curl -X GET "http://localhost:8080/api/search?q=Math%20for%20Beginners&category=
 - Added fuzzy matching on title field using `Criteria.fuzzy()`
 - Maintains existing exact match and description search
 - Fuzzy matching works alongside all existing filters
+
+## Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+mvn test
+
+# Run tests with detailed output
+mvn test -Dtest=SearchControllerTest
+
+# Run specific test class
+mvn test -Dtest=SearchServiceTest
+```
+
+### Test Coverage
+
+The application includes comprehensive test coverage:
+
+#### Controller Tests (`SearchControllerTest`)
+- ✅ Search with all parameters
+- ✅ Search with only keyword
+- ✅ Search with no parameters
+- ✅ Search when service returns null
+- ✅ Search with custom pagination
+- ✅ Search with different sort options
+- ✅ Autocomplete with valid query
+- ✅ Autocomplete with empty query
+- ✅ Autocomplete with single character
+- ✅ Autocomplete with long query
+- ✅ Autocomplete with special characters
+
+#### Service Tests (`SearchServiceTest`)
+- ✅ Basic search functionality
+- ✅ Search with filters
+- ✅ Search with pagination
+- ✅ Search with sorting
+- ✅ Autocomplete functionality
+- ✅ Edge cases and error handling
+
+### Test Examples
+
+```bash
+# Run controller tests
+mvn test -Dtest=SearchControllerTest
+
+# Run service tests  
+mvn test -Dtest=SearchServiceTest
+
+# Run all tests with coverage report
+mvn clean test jacoco:report
+```
 
 ## Running the Application
 
